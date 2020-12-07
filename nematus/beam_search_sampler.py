@@ -355,7 +355,10 @@ def _generate_while_loop_body_func(model_adapters, decoding_functions,
 
             # Get logits.
             step_logits, alive_memories[i] = decoding_functions[i](
-                next_ids, current_time_step, alive_memories[i], alive_seq_batch)
+                step_target_ids=next_ids,
+                current_time_step=current_time_step,
+                memories=alive_memories[i],
+                x=alive_seq_batch)
 
             # Calculate the scores for all possible extensions of alive
             # hypotheses.

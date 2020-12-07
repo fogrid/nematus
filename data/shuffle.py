@@ -10,7 +10,7 @@ import tempfile
 # TODO Make CHUNK_SIZE user configurable?
 CHUNK_SIZE = 10000000  # Number of lines.
 
-def jointly_shuffle_files(files, temporary=False):
+def jointly_shuffle_files(files, lines_file=None, temporary=False):
     """Randomly shuffle the given files, applying the same permutation to each.
 
     Since the same permutation is applied to all input files, they must
@@ -28,6 +28,8 @@ def jointly_shuffle_files(files, temporary=False):
 
     Args:
         files: a list of strings specifying the paths of the input files.
+        lines_file: contains the lines to read in the files. if a line needs to be skipped,
+                    it's id won't appear in the lines file. None means reading all lines.
         temporary: a Boolean (see description above).
 
     Returns:
@@ -37,14 +39,17 @@ def jointly_shuffle_files(files, temporary=False):
     """
 
     # Determine the number of lines (should be the same for all files).
-    total_lines = 0
-    for _ in open(files[0]):
-        total_lines += 1
+    if lines_file is None:
+        total_lines = 0
+        for _ in open(files[0]):
+            total_lines += 1
 
-    # Randomly permute the list of line numbers.
-    perm = list(range(total_lines))
-    random.shuffle(perm)
-
+        # Randomly permute the list of line numbers.
+        perm = list(range(total_lines))
+        random.shuffle(perm)
+    else:
+        perm = [int(x.strip()) for x in open(lines_file)]
+        random.shuffle(perm)
     # Convert the list of line numbers to a list of chunk indices and offsets.
     ordering = [(i // CHUNK_SIZE, i % CHUNK_SIZE) for i in perm]
 

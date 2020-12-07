@@ -84,8 +84,10 @@ def load_data(config):
         keep_data_in_memory=config.keep_train_set_in_memory,
         preprocess_script=config.preprocess_script,
         target_graph=config.target_graph,
+        target_semantic_graph=config.target_semantic_graph,
         target_labels_num=config.target_labels_num,
-        splitted_action=config.split_transitions
+        splitted_action=config.split_transitions,
+        lines_file_path=config.lines_file
     )
 
     if config.valid_freq and config.valid_source_dataset and config.valid_target_dataset:
@@ -108,9 +110,11 @@ def load_data(config):
             token_batch_size=config.valid_token_batch_size,
             remove_parse=remove_parse,
             target_graph=config.target_graph,
+            target_semantic_graph=config.target_semantic_graph,
             target_labels_num=config.target_labels_num,
             splitted_action=config.split_transitions,
-            ignore_empty=True
+            ignore_empty=True,
+            lines_file_path=config.valid_lines_file
         )
     else:
         logging.info('no validation set loaded')
@@ -641,7 +645,7 @@ def calc_cross_entropy_per_sentence(session, model, config, text_iterator, updat
         x, x_mask, y, y_mask, x_edges_time, x_labels_time, x_parents_time = util.prepare_data(source_sents,
                                                                                               target_sents,
                                                                                               target_edges_time,
-                                                                                              target_labels_time,
+                                                                                             target_labels_time,
                                                                                               target_parents_time,
                                                                                               config.factors,
                                                                                               maxlen=None)

@@ -9,11 +9,17 @@ def remove_edges(text):
     res = []
     EDGE_END = "@@|"
     LABEL_START = "|@@"
+    NODE_ACT_MARK = "##|"
+    STACK_ACTION_MARK = "$$|"
     for word in text:
         if not (word.startswith(LABEL_START) or word.endswith(EDGE_END)):
             if (word.startswith("L") or word.startswith(
                     "R")) and EDGE_END in word:  # detokenization clasps ("." and other punctuation to the previous word)
                 word = word[word.index(EDGE_END) + len(EDGE_END):]
+            elif word.endswith(NODE_ACT_MARK):
+                word = word[word.index(NODE_ACT_MARK) + len(NODE_ACT_MARK):]
+            elif word.endswith(STACK_ACTION_MARK):
+                word = word[word.index(STACK_ACTION_MARK) + len(STACK_ACTION_MARK):]
             res.append(word)
     return " ".join(res)
 

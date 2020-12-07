@@ -365,6 +365,20 @@ class ConfigSpecification:
             help='True if system also parses the target (default: False)'))
 
         group.append(ParameterSpecification(
+            name='target_semantic_graph', default=False,
+            visible_arg_names=['--target_semantic_graph'],
+            action='store_true',
+            help='True if system also parses the target as a semantic graph from tupa.'
+                 ' target_graph must also be true (default: False)'))
+
+        group.append(ParameterSpecification(
+            name='lines_file', default=None,
+            visible_arg_names=['--lines_file'],
+            type=str,
+            help='path to file containing line numbers to parse (num in each line). '
+                 'if not given will parse all lines.'))
+
+        group.append(ParameterSpecification(
             name='parent_head', default=False,
             visible_arg_names=['--parent_head'],
             action='store_true',
@@ -810,6 +824,7 @@ class ConfigSpecification:
             type=str, metavar='PATH',
             help='source validation corpus (default: %(default)s)'))
 
+
         group.append(ParameterSpecification(
             name='valid_bleu_source_dataset', default=None,
             visible_arg_names=['--valid_bleu_source_dataset'],
@@ -823,6 +838,13 @@ class ConfigSpecification:
             derivation_func=_derive_valid_target_dataset,
             type=str, metavar='PATH',
             help='target validation corpus (default: %(default)s)'))
+
+        group.append(ParameterSpecification(
+            name='valid_lines_file', default=None,
+            visible_arg_names=['--valid_lines_file'],
+            derivation_func=_derive_valid_source_dataset,
+            type=str, metavar='PATH',
+            help='lines file for validation corpus (default: %(default)s)'))
 
         # Hidden option for backward compatibility.
         group.append(ParameterSpecification(

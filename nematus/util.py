@@ -32,8 +32,8 @@ def parse_transitions(target_dict, splitted_action=False):
     Given the same edge types or labels the same dictionary will be made.
     """
     edge_end = "@@|"
-    label_start = "|@@"
     if splitted_action:
+        label_start = "|@@"
         target_actions = {key: val
                           for key, val in target_dict.items() if edge_end in key}
         target_actions = reset_dict_vals(target_actions)
@@ -265,6 +265,7 @@ def dense_to_sparse_tensor(dns, base_val=float("inf"), feeding=False):
 
 
 def load_dict(filename, model_type):
+    print(f"loading dict from {filename}")
     try:
         # build_dictionary.py writes JSON files as UTF-8 so assume that here.
         with open(filename, 'r', encoding='utf-8') as f:

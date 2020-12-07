@@ -520,7 +520,7 @@ class GCN(base.Layer):
         xw = standard_ops.tensordot(
             self.x, self.gate_kernel, tf.constant([[-1], [0]], dtype=tf.int32))
         xw = expand_dims(xw, 2)
-
+        print("xw:", xw)
         # main gate
         if self.sparse_graph:
             # tf.cast(tf.shape(self.labels), tf.int64)
@@ -545,6 +545,7 @@ class GCN(base.Layer):
             res_vals = tf.gather_nd(xw, gate_indices)
 
             # assumes not a multi-label-graph
+            print("self.labels:", self.labels)
             indices = self.labels.indices[:, :-1]  # * [1,1,1,0]
             # printops = []
             # indices = indices[:,0] + indices[:,1] * 100 + indices[:,2] * 100 * 100 # + indices[:,3] * 100 * 100 * 100
@@ -556,6 +557,7 @@ class GCN(base.Layer):
             # edges = tf.sparse.reduce_sum(sparse_xw, axis=-1)
             sparse_xw = tf.SparseTensor(indices, res_vals, res_shape[
                                         :-1])  # assumes not a multi-graph
+            print("sparse_xw", sparse_xw)
             edges = tf.compat.v1.sparse.to_dense(sparse_xw)
 
             # sparse_xw = tf.SparseTensor(self.labels.indices, res_vals, res_shape) # for a multi-graph
