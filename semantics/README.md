@@ -17,3 +17,6 @@ You may want to run `pip install -r requirements.txt` and `pip install -r requir
 Most future changes to this should be done in the `convert_semantic_transitions_text_to_graph()` function, under `nematus/data_iterator.py`, and where this function is called.  
 Another point of interest is the FileWrapper class in data_iterator.py, which was changed to consume a lines file indicating which lines should be processed.
 
+## Notes
+* The length of the transitions here is long. This means more memory consumption and longer run time. Consider this.
+* For the above reason, validation set used was capped to 1000 sentences, and it still takes a long time to validate.
