@@ -7,7 +7,6 @@
 #SBATCH --mail-user=oded.fogel@mail.huji.ac.il
 #SBATCH --output=/cs/snapless/oabend/fogrid/nematus/semantics/slurm/de-en_ucca_trns%j.out
 
-
 ####################### Setup path and data Variables
 vocab_in=/cs/snapless/oabend/borgr/SSMT/preprocess/data/en_de/5.8/vocab.clean.unesc.tok.tc.bpe.de
 vocab_out=/cs/snapless/oabend/borgr/SSMT/preprocess/data/en_de/5.8/vocab.clean.unesc.tok.tc.bpe.en
@@ -28,8 +27,8 @@ mkdir -p $model_dir
 working_dir=$model_dir/prod
 mkdir -p $working_dir
 
-dev_prefix=train
-dev_prefix=${dev_prefix}.clean
+# Setup the files used for training
+dev_prefix=train.clean
 
 src_train=$data_dir/${dev_prefix}.unesc.tok.tc.bpe.de
 
@@ -39,6 +38,11 @@ ucca_input=${trg_train_raw}.txt
 ucca_output_dir="${trg_train_raw}_ucca_res/"
 
 trg_train=$data_dir/${dev_prefix}.unesc.tok.tc.en.ucca_trns
+
+# Setup the files used for validation.
+valid_prefix=newstest2013
+src_valid=$data_dir/${valid_prefix}.unesc.tok.tc.bpe.de
+trg_valid=$data_dir/${valid_prefix}.unesc.tok.tc.en.ucca_trns
 
 ####################### prepeare UCCA transitiosn file
 if [ ! -f ${trg_train} ]; then
@@ -53,15 +57,11 @@ if [ ! -f ${trg_train} ]; then
 
   python -m tupa "$ucca_input" --lang en -m bert_multilingual_layers_4_layers_pooling_weighted_align_sum
   mkdir --parents "$ucca_output_dir"
-  find . -maxdepth 1 -type f -name "${trg_train_raw_filename}_*.xml" -exec mv -t $ucca_output_dir "{}" +
-  python semantic_transition_parsing.py "$ucca_output_dir" "$trg_train"  "$bpe_file"
+  find . -maxdepth 1 -type f -name "${trg_train_raw }_*.xml" -exec mv -t $ucca_output_dir "{}" +
+  python ${main_dir}/semantic_transition_parsing.py "$ucca_output_dir" "$trg_train"  "$bpe_file"
 fi
 
 ####################### Train model
-
-valid_prefix=newstest2013
-src_valid=$data_dir/${valid_prefix}.unesc.tok.tc.bpe.de
-trg_valid=$data_dir/${valid_prefix}.unesc.tok.tc.en.ucca_trns
 
 src_bpe=$src_train.json
 trg_bpe=$trg_train.json
@@ -120,14 +120,14 @@ python "${nematus_home}/nematus/train.py" \
     --disp_freq 100 \
     --sample_freq 0 \
     --beam_freq 1000 \
-    --beam_size 8 \
     --translation_maxlen $len \
+    --beam_size 8 \
     --target_labels_num 45\
     --non_sequential \
     --target_graph \
     --normalization_alpha 0.6\
-    --valid_source_dataset $src_dev \
-    --valid_target_dataset $trg_dev \
+    --valid_source_dataset $src_valid \
+    --valid_target_dataset $trg_valid \
     --valid_batch_size 4 \
     --max_tokens_per_device $tokens_per_device \
     --valid_freq 10000 \
@@ -136,5 +136,6 @@ python "${nematus_home}/nematus/train.py" \
     --target_semantic_graph \
     --lines_file ${trg_train}.line_nums \
     --valid_lines_file $trg_valid.line_nums
+
 
 echo done

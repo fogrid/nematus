@@ -557,7 +557,6 @@ class GCN(base.Layer):
             # edges = tf.sparse.reduce_sum(sparse_xw, axis=-1)
             sparse_xw = tf.SparseTensor(indices, res_vals, res_shape[
                                         :-1])  # assumes not a multi-graph
-            print("sparse_xw", sparse_xw)
             edges = tf.compat.v1.sparse.to_dense(sparse_xw)
 
             # sparse_xw = tf.SparseTensor(self.labels.indices, res_vals, res_shape) # for a multi-graph

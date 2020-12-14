@@ -510,16 +510,16 @@ def convert_semantic_transitions_text_to_graph(x_target,
                                            graceful=False,
                                             split=False):
     """
-    TODO document
+
     Must send x_target with <GO> at beggining of each line, and max_len+1
-    :param x_target:
-    :param max_len:
-    :param labels_dict:
-    :param num_labels:
-    :param split:
-    :param attend_max:
-    :param graceful:
-    :return:
+    :param x_target:    target transitions set.
+    :param max_len:     max sentence len
+    :param labels_dict: dict mapping labels to an index (used to create the labels matrix)
+    :param num_labels:  number of available labels
+    :param attend_max:  whether to use the max_len parameter
+    :param graceful:    whether to abort when there's an error
+    :param split:       where to split the edges and their labels (NOT SUPPORTED!)
+    :return:            Matrics of the edges and the labels.
     """
     assert not split # not supporting split labels
     print(f"parsing transitions line to graph.")
@@ -650,10 +650,10 @@ def convert_semantic_transitions_text_to_graph(x_target,
             token_num += 1  # number of tokens that are not transitions (actual subwords)
 
     edge_times = np.array(edge_times, dtype=np.float32)
-    print("edge array", edge_times)
-    print("edge array non_inf", np.argwhere(edge_times < 1000), edge_times[edge_times<1000])
-    print("x_target for graph convert", x_target, np.array(x_target).shape)
-    print(f"edge_times shape:{edge_times.shape}, label_times shape:{label_times.shape}, x_target len:{len(x_target)}\n")
+    # print("edge array", edge_times)
+    # print("edge array non_inf", np.argwhere(edge_times < 1000), edge_times[edge_times<1000])
+    # print("x_target for graph convert", x_target, np.array(x_target).shape)
+    # print(f"edge_times shape:{edge_times.shape}, label_times shape:{label_times.shape}, x_target len:{len(x_target)}\n")
     if num_labels:
         label_times = np.array(label_times, dtype=np.float32)
     else:

@@ -53,7 +53,6 @@ def xml_to_tranisions(source_ucca_dir, output_path, bpe_path, lines_file_path):
                     print(f"bpe passage: {bpe_passage}")
                     try:
                         transition_str = ucca_passage_to_transition_line(passage, bpe_passage)
-                        # print(f"\nline: {transition_str}")
                         print(transition_str, file=output_file)
                         print(i, file=lines_file)
                     except Exception as e:
