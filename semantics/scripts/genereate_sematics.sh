@@ -31,13 +31,13 @@ trg_train=$data_dir/${dev_prefix}.unesc.tok.tc.en.ucca_trns
 ####################### prepeare UCCA transitiosn file
 #if [ ! -f ${trg_train} ]; then
 echo "creating target file ${trg_train}"
-#  if [ ! -f ${ucca_input} ]; then
-echo "creating input to ucca ${ucca_input}"
-# add .txt to the file (ucca requires this)
-cp $trg_train_raw $ucca_input
-# separate each sentence with empty line (by replacing single \n with double \n)
-perl -i -pe 's/\n/\n\n/g' $ucca_input
-#  fi
+if [ ! -f ${ucca_input} ]; then
+  echo "creating input to ucca ${ucca_input}"
+  # add .txt to the file (ucca requires this)
+  cp $trg_train_raw $ucca_input
+  # separate each sentence with empty line (by replacing single \n with double \n)
+  perl -i -pe 's/\n/\n\n/g' $ucca_input
+fi
 
 python -m tupa "$ucca_input" --lang en -m bert_multilingual_layers_4_layers_pooling_weighted_align_sum
 mkdir --parents "$ucca_output_dir"
