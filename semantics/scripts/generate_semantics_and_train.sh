@@ -4,8 +4,8 @@
 #SBATCH --time=7-0
 #SBATCH --gres=gpu:4,vmem:8g
 #SBATCH --mail-type=BEGIN,END,FAIL,TIME_LIMIT
-#SBATCH --mail-user=oded.fogel@mail.huji.ac.il
 #SBATCH --output=/cs/snapless/oabend/fogrid/nematus/semantics/slurm/de-en_ucca_trns%j.out
+# #SBATCH --mail-user=oded.fogel@mail.huji.ac.il
 
 ####################### Setup path and data Variables
 vocab_in=/cs/snapless/oabend/borgr/SSMT/preprocess/data/en_de/5.8/vocab.clean.unesc.tok.tc.bpe.de

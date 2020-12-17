@@ -4,8 +4,8 @@
 #SBATCH --time=2-0
 #SBATCH --gres=gpu:1
 #SBATCH --mail-type=BEGIN,END,FAIL,TIME_LIMIT
-#SBATCH --mail-user=oded.fogel@mail.huji.ac.il
 # #SBATCH --output=/cs/snapless/oabend/fogrid/semantics/results/en-de_test%j.out
+# #SBATCH --mail-user=oded.fogel@mail.huji.ac.il
 
 # #SBATCH --gres=gpu:4,vmem:8g
 

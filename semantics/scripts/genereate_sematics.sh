@@ -4,8 +4,8 @@
 #SBATCH --time=7-0
 #SBATCH --gres=gpu:4,vmem:8g
 #SBATCH --mail-type=BEGIN,END,FAIL,TIME_LIMIT
-#SBATCH --mail-user=oded.fogel@mail.huji.ac.il
 # #SBATCH --output=/cs/snapless/oabend/fogrid/nematus/semantics/slurm/en-de_gcn%j.out
+# #SBATCH --mail-user=oded.fogel@mail.huji.ac.il
 
 
 ####################### Setup path and data Variables
