@@ -2,11 +2,11 @@
 #SBATCH --wckey=strmt
 #SBATCH --mem=48g
 #SBATCH -c4
-#SBATCH --time=7-0
+#SBATCH --time=6-0
 #SBATCH --gres=gpu:4,vmem:8g
 #SBATCH --mail-type=BEGIN,END,FAIL,TIME_LIMIT
+#SBATCH --mail-user=oded.fogel@mail.huji.ac.il
 #SBATCH --output=/cs/snapless/oabend/fogrid/nematus/semantics/slurm/de-en_ucca_trns%j.out
-# #SBATCH --mail-user=oded.fogel@mail.huji.ac.il
 
 ####################### Setup path and data Variables
 vocab_in=/cs/snapless/oabend/borgr/SSMT/preprocess/data/en_de/5.8/vocab.clean.unesc.tok.tc.bpe.de
@@ -28,7 +28,7 @@ mkdir -p $model_dir
 working_dir=$model_dir/prod
 mkdir -p $working_dir
 
-# Setup the files used for training
+#dev_prefix=newstest2013
 dev_prefix=train.clean
 
 src_train=$data_dir/${dev_prefix}.unesc.tok.tc.bpe.de
@@ -39,11 +39,6 @@ ucca_input=${trg_train_raw}.txt
 ucca_output_dir="${trg_train_raw}_ucca_res/"
 
 trg_train=$data_dir/${dev_prefix}.unesc.tok.tc.en.ucca_trns
-
-# Setup the files used for validation.
-valid_prefix=newstest2013
-src_valid=$data_dir/${valid_prefix}.unesc.tok.tc.bpe.de
-trg_valid=$data_dir/${valid_prefix}.unesc.tok.tc.en.ucca_trns
 
 ####################### prepeare UCCA transitiosn file
 if [ ! -f ${trg_train} ]; then
@@ -63,6 +58,10 @@ if [ ! -f ${trg_train} ]; then
 fi
 
 ####################### Train model
+
+valid_prefix=newstest2013
+src_valid=$data_dir/${valid_prefix}.unesc.tok.tc.bpe.de
+trg_valid=$data_dir/${valid_prefix}.unesc.tok.tc.en.ucca_trns
 
 src_bpe=$src_train.json
 trg_bpe=$trg_train.json
@@ -86,21 +85,26 @@ if [ ! -f ${src_bpe} ]; then
     rm $tmp
 fi
 
-len=160
+len=80
 batch_size=128
 embedding_size=256
 # token_batch_size=2048
 # sent_per_device=4
 tokens_per_device=100
 dec_blocks=4
+warmup_steps=4000
+valid_freq=10000
+save_freq=1000
 enc_blocks="${dec_blocks}"
+
+
 lshw -C display | tail # write the acquired gpu properties
 
 python "${nematus_home}/nematus/train.py" \
     --source_dataset $src_train \
     --target_dataset $trg_train \
     --dictionaries $src_bpe $trg_bpe\
-    --save_freq 1000 \
+    --save_freq $save_freq \
     --model $working_dir/model_seq_trans.npz \
     --reload latest_checkpoint \
     --model_type transformer \
@@ -115,7 +119,7 @@ python "${nematus_home}/nematus/train.py" \
     --transformer_dec_depth $dec_blocks \
     --transformer_enc_depth $enc_blocks \
     --learning_schedule transformer \
-    --warmup_steps 4000 \
+    --warmup_steps $warmup_steps \
     --maxlen $len \
     --batch_size $batch_size \
     --disp_freq 100 \
@@ -123,20 +127,22 @@ python "${nematus_home}/nematus/train.py" \
     --beam_freq 1000 \
     --translation_maxlen $len \
     --beam_size 8 \
-    --target_labels_num 45\
-    --non_sequential \
-    --target_graph \
-    --normalization_alpha 0.6\
+    --normalization_alpha 0.6 \
     --valid_source_dataset $src_valid \
     --valid_target_dataset $trg_valid \
     --valid_batch_size 4 \
     --max_tokens_per_device $tokens_per_device \
-    --valid_freq 10000 \
+    --valid_freq $valid_freq \
     --valid_script "${script_dir}/validate_seq.sh" \
     --valid_remove_parse \
     --target_semantic_graph \
     --lines_file ${trg_train}.line_nums \
-    --valid_lines_file $trg_valid.line_nums
-
+    --valid_lines_file ${trg_valid}.line_nums \
+    --non_sequential \
+    --target_graph \
+    --parent_head \
+    --target_gcn_layers 0 \
+    --target_labels_num 0
+#    --profile
 
 echo done

@@ -542,7 +542,7 @@ def convert_semantic_transitions_text_to_graph(x_target,
     if num_labels:
         label_times = numpy.zeros((max_len, max_len, num_labels)) + float("inf")
     else:
-        labels_times = None
+        label_times = None
     token_num = 0
     nodes_num = 0
 
@@ -559,9 +559,6 @@ def convert_semantic_transitions_text_to_graph(x_target,
     # root_mark = "|**"
 
     for token_id, token in enumerate(x_target):
-        print(f"parsing token num {token_id}. token: {token}\n"
-              f"tokens_buffer: {tokens_buffer}\n"
-              f"tokens_stack: {tokens_stack}")
         if token_id == 0:  # root is added to the word at the beginning, add it to stack
             idxs_stack.append(token_id)
             tokens_stack.append(token)
@@ -572,7 +569,7 @@ def convert_semantic_transitions_text_to_graph(x_target,
             tokens_buffer.append(f"node_{nodes_num}")
             nodes_num += 1
             node_label = token[node_label_idx]
-            edge_label_token = "RIGHT-EDGE-" + node_label + edge_mark
+            edge_label_token = "R-EDGE-" + node_label + edge_mark
             dependent_ids, _ = _last_word(idxs_stack, tokens_stack, graceful=graceful)
             heads_ids = [token_id]
 
@@ -610,7 +607,7 @@ def convert_semantic_transitions_text_to_graph(x_target,
         elif token.endswith(edge_mark):
             # assert graceful or not num_labels, token + "," + " ".join(x_target)
             assert not split
-            if token.startswith("LEFT"):
+            if token.startswith("L"):
                 min_len_cond = len(idxs_stack) > 1
                 if graceful and not min_len_cond:
                     heads_ids = []
@@ -622,21 +619,13 @@ def convert_semantic_transitions_text_to_graph(x_target,
                 no_head_idxs_stack, no_head_tokens_stack = idxs_stack[:-len(heads_ids)], tokens_stack[:-len(heads_ids)]
                 dependent_ids, dependent_tokens = _last_word(no_head_idxs_stack, no_head_tokens_stack, graceful=graceful)
 
-            elif token.startswith("RIGHT"):
-                try:
-                    label_token = token
-                    assert label_token == x_target[token_id], (label_token, token_id, x_target)
-                    dependent_ids, dependent_tokens = _last_word(idxs_stack, tokens_stack, graceful=graceful)
-                    no_dep_idxs_stack, no_dep_tokens_stack = idxs_stack[:-len(dependent_ids)], tokens_stack[:-len(dependent_tokens)]
-                    heads_ids, head_tokens = _last_word(no_dep_idxs_stack, no_dep_tokens_stack, graceful=graceful)
-                except Exception as e:
-                    dependent_ids, dependent_tokens = _last_word(idxs_stack, tokens_stack, graceful=graceful)
-                    no_dep_idxs_stack, no_dep_tokens_stack = idxs_stack[:-len(dependent_ids)], tokens_stack[:-len(dependent_tokens)]
-                    print(f"failed when parsing RIGHT edge.\n "
-                          f"idxs_stack={idxs_stack}\n"
-                          f"tokens_stack={tokens_stack}\n"
-                          f"no_dep_idxs_stack={no_dep_idxs_stack}, no_dep_tokens_stack={no_dep_tokens_stack}")
-                    raise e
+            elif token.startswith("R"):
+                label_token = token
+                assert label_token == x_target[token_id], (label_token, token_id, x_target)
+                dependent_ids, dependent_tokens = _last_word(idxs_stack, tokens_stack, graceful=graceful)
+                no_dep_idxs_stack, no_dep_tokens_stack = idxs_stack[:-len(dependent_ids)], tokens_stack[:-len(dependent_tokens)]
+                heads_ids, head_tokens = _last_word(no_dep_idxs_stack, no_dep_tokens_stack, graceful=graceful)
+
             elif not token.startswith("FINISH"):
                 raise ValueError("Unexpected action token" + token)
 

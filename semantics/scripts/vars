@@ -1,5 +1,13 @@
 src=en
 trg=de
+
+# scripts directory of moses decoder: http://www.statmt.org/moses/
+# you do not need to compile moses; a simple download is sufficient
+moses_scripts=/cs/snapless/oabend/borgr/SSMT/preprocess/mosesdecoder/scripts
+
+#scripts for subword segmentation: https://github.com/rsennrich/subword-nmt
+bpe_scripts=/cs/snapless/oabend/borgr/SSMT/preprocess/subword-nmt
+
 nematus_home=/cs/snapless/oabend/fogrid/nematus
 remove_edges=$nematus_home/nematus/parsing/remove_edges.py
 capitalized_langs=(en de fr es ru)

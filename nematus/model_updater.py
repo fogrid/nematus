@@ -316,8 +316,8 @@ class ModelUpdater(object):
                     profiler.advise(ALL_ADVICE)
 
                     # For one-shot API
-                    profiler.advise(
-                        session.graph, run_meta=run_meta)
+                    # profiler.advise(
+                    #     session.graph, run_meta=run_meta)
                     if self.deleteme % 10 == 0:
                         raise
 
